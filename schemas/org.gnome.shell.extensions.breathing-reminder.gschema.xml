@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema id="org.gnome.shell.extensions.breathing-reminder"
+            path="/org/gnome/shell/extensions/breathing-reminder/">
+
+        <key name="enabled" type="b">
+            <default>false</default>
+            <summary>Enable breathing reminder</summary>
+        </key>
+
+        <!-- Phase durations -->
+        <key name="inhale-duration" type="d">
+            <default>4.0</default>
+            <range min="0.5" max="60.0"/>
+            <summary>Inhale duration in seconds</summary>
+        </key>
+        <key name="hold-in-duration" type="d">
+            <default>4.0</default>
+            <range min="0.0" max="60.0"/>
+            <summary>Hold after inhale in seconds (0 = skip)</summary>
+        </key>
+        <key name="exhale-duration" type="d">
+            <default>4.0</default>
+            <range min="0.5" max="60.0"/>
+            <summary>Exhale duration in seconds</summary>
+        </key>
+        <key name="hold-out-duration" type="d">
+            <default>4.0</default>
+            <range min="0.0" max="60.0"/>
+            <summary>Hold after exhale in seconds (0 = skip)</summary>
+        </key>
+
+        <!-- Bar appearance -->
+        <key name="bar-position" type="s">
+            <default>'top'</default>
+            <summary>Screen edge: top, bottom, left, right</summary>
+        </key>
+        <key name="bar-thickness" type="i">
+            <default>6</default>
+            <range min="2" max="60"/>
+            <summary>Bar thickness in pixels</summary>
+        </key>
+        <key name="opacity" type="d">
+            <default>0.85</default>
+            <range min="0.05" max="1.0"/>
+            <summary>Bar opacity</summary>
+        </key>
+        <key name="color-crossfade" type="b">
+            <default>true</default>
+            <summary>Smoothly crossfade colors between phases</summary>
+        </key>
+        <key name="pulse-on-hold" type="b">
+            <default>true</default>
+            <summary>Gently pulse bar opacity during hold phases</summary>
+        </key>
+
+        <!-- Colors -->
+        <key name="inhale-color" type="s">
+            <default>'#4CAF50'</default>
+            <summary>Color during inhale phase</summary>
+        </key>
+        <key name="exhale-color" type="s">
+            <default>'#2196F3'</default>
+            <summary>Color during exhale phase</summary>
+        </key>
+        <key name="hold-color" type="s">
+            <default>'#FF9800'</default>
+            <summary>Color during hold phases</summary>
+        </key>
+
+        <!-- Sound -->
+        <key name="sound-enabled" type="b">
+            <default>false</default>
+            <summary>Play a sound at each phase transition</summary>
+        </key>
+
+        <!-- Session mode -->
+        <key name="session-end-mode" type="s">
+            <default>'duration'</default>
+            <summary>Session end mode: duration or cycles</summary>
+        </key>
+        <key name="session-duration" type="i">
+            <default>5</default>
+            <range min="1" max="60"/>
+            <summary>Guided session duration in minutes</summary>
+        </key>
+        <key name="session-cycles" type="i">
+            <default>10</default>
+            <range min="1" max="100"/>
+            <summary>Number of breath cycles for a guided session</summary>
+        </key>
+
+        <!-- Idle auto-start -->
+        <key name="idle-auto-start" type="b">
+            <default>false</default>
+            <summary>Auto-start bar when system is idle</summary>
+        </key>
+        <key name="idle-duration" type="i">
+            <default>5</default>
+            <range min="1" max="60"/>
+            <summary>Idle time in minutes before auto-starting</summary>
+        </key>
+
+        <!-- Monitor: -2=all, -1=primary, 0+=specific -->
+        <key name="monitor" type="i">
+            <default>-1</default>
+            <range min="-2" max="9"/>
+            <summary>Monitor: -2=all, -1=primary, 0+=specific index</summary>
+        </key>
+
+        <key name="preset" type="s">
+            <default>'box'</default>
+            <summary>Active breathing preset</summary>
+        </key>
+
+    </schema>
+</schemalist>
