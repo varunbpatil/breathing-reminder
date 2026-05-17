@@ -571,6 +571,11 @@ class BreathingIndicator extends PanelMenu.Button {
 
         // Technique quick-select submenu
         const techMenu = new PopupMenu.PopupSubMenuMenuItem("Technique");
+        const techItems = {};
+        const updateTechOrnaments = (activeKey) => {
+            for (const [k, it] of Object.entries(techItems))
+                it.setOrnament(k === activeKey ? PopupMenu.Ornament.CHECK : PopupMenu.Ornament.NONE);
+        };
         for (const [key, p] of Object.entries(PRESETS)) {
             const item = new PopupMenu.PopupMenuItem(p.label);
             item.connect("activate", () => {
@@ -582,7 +587,11 @@ class BreathingIndicator extends PanelMenu.Button {
                 if (this._bar?.running) this._bar.restart();
             });
             techMenu.menu.addMenuItem(item);
+            techItems[key] = item;
         }
+        updateTechOrnaments(this._settings.get_string("preset"));
+        this._settings.connect("changed::preset", () =>
+            updateTechOrnaments(this._settings.get_string("preset")));
         this.menu.addMenuItem(techMenu);
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
