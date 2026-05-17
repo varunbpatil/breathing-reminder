@@ -304,8 +304,9 @@ class BreathingBar {
         const opacity      = this._settings.get_double("opacity") * this._holdPulse;
         const isHorizontal = ["top", "bottom"].includes(this._settings.get_string("bar-position"));
 
-        // Dim background track — stays visible even at 0 progress (hold-out)
-        cr.setSourceRGBA(color.r, color.g, color.b, opacity * 0.18);
+        // Track: full-width dim background. Hold-out uses higher opacity so hold color is clearly visible.
+        const trackOpacity = this._phase === "hold-out" ? opacity * 0.55 : opacity * 0.18;
+        cr.setSourceRGBA(color.r, color.g, color.b, trackOpacity);
         cr.rectangle(0, 0, w, h);
         cr.fill();
 
