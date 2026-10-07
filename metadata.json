@@ -3,6 +3,6 @@
   "description": "A thin animated bar at the screen edge to guide breathing with configurable inhale, hold, and exhale phases.",
   "uuid": "breathing-reminder@varunbpatil",
   "version": 1,
-  "shell-version": ["48", "49", "50"],
+  "shell-version": ["48", "49", "50", "51"],
   "url": "https://github.com/varunbpatil/breathing-reminder"
 }
