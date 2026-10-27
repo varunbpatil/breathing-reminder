@@ -397,6 +397,14 @@ class BreathingSession extends St.Widget {
             console.error("BreathingReminder: failed to set vertical layout", e);
         }
 
+        // Get current technique name
+        const presetKey = settings.get_string("preset");
+        let techniqueName = presetKey;
+        if (typeof PRESETS !== 'undefined' && PRESETS[presetKey]) {
+            techniqueName = PRESETS[presetKey].label;
+        }
+
+        this._techLbl     = new St.Label({ text: techniqueName, style: "font-size: 26px; color: rgba(255,255,255,0.8); text-align: center; margin-bottom: 10px;", x_align: Clutter.ActorAlign.CENTER });
         this._arrowLbl    = new St.Label({ style: "font-size: 72px; text-align: center;", x_align: Clutter.ActorAlign.CENTER });
         this._phaseLbl    = new St.Label({ style: "font-size: 50px; font-weight: bold; text-align: center;", x_align: Clutter.ActorAlign.CENTER });
         this._phaseSecLbl = new St.Label({ style: "font-size: 22px; color: rgba(255,255,255,0.55); text-align: center;", x_align: Clutter.ActorAlign.CENTER });
@@ -426,6 +434,7 @@ class BreathingSession extends St.Widget {
         });
         endBtn.connect("clicked", () => this.end());
 
+        content.add_child(this._techLbl);
         content.add_child(this._arrowLbl);
         content.add_child(this._phaseLbl);
         content.add_child(this._phaseSecLbl);
