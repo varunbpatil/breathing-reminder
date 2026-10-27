@@ -705,18 +705,42 @@ class BreathingIndicator extends PanelMenu.Button {
     _startSession() {
         if (!this._bar) return;
         this._sessionStartedBar = !this._bar.running;
+        this._sessionWasEnabled = this._settings.get_boolean("enabled");
         if (!this._bar.running) {
             this._settings.set_boolean("enabled", true);
             this._bar.start();
         }
+        // Hide the breathing bar areas during the full-screen session without stopping animation
+        this._sessionHiddenAreas = [];
+        if (this._bar._areas) {
+            for (const area of this._bar._areas) {
+                if (area.visible) {
+                    this._sessionHiddenAreas.push(area);
+                    area.hide();
+                }
+            }
+        }
         this._session = new BreathingSession(this._settings, this._bar, () => {
             this._session = null;
             this._sessionItem.label.text = "▶  Start Session";
-            // Restore bar to pre-session state if we started it
+            // Restore hidden bar areas
+            if (this._sessionHiddenAreas) {
+                for (const area of this._sessionHiddenAreas) {
+                    try { if (this._bar.running) area.show(); } catch (_) {}
+                }
+                this._sessionHiddenAreas = [];
+            }
+            // Restore bar to pre-session state
             if (this._sessionStartedBar) {
                 this._sessionStartedBar = false;
                 this._settings.set_boolean("enabled", false);
                 this._bar.stop();
+            } else if (!this._sessionWasEnabled && this._bar.running) {
+                this._settings.set_boolean("enabled", false);
+                this._bar.stop();
+            } else if (this._sessionWasEnabled && !this._bar.running) {
+                this._settings.set_boolean("enabled", true);
+                this._bar.start();
             }
         });
         this._sessionItem.label.text = "■  End Session";
