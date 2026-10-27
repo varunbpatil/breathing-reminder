@@ -609,7 +609,7 @@ class BreathingSession extends St.Widget {
 const BreathingIndicator = GObject.registerClass(
 class BreathingIndicator extends PanelMenu.Button {
     _init(extension) {
-        super._init(0.0, "Breathing Reminder");
+        super._init(0.5, "Breathing Reminder");
 
         this._extension = extension;
         this._settings  = extension.getSettings();
