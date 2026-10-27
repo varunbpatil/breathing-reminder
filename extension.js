@@ -381,11 +381,21 @@ class BreathingSession extends St.Widget {
 
         // Content box
         const content = new St.BoxLayout({
-            vertical: true,
             x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
             style: "spacing: 14px; padding: 56px;",
         });
+        try {
+            if (typeof content.set_vertical === 'function') {
+                content.set_vertical(true);
+            } else if (content.layout_manager && typeof content.layout_manager.set_orientation === 'function') {
+                content.layout_manager.set_orientation(Clutter.Orientation.VERTICAL);
+            } else {
+                content.vertical = true;
+            }
+        } catch (e) {
+            console.error("BreathingReminder: failed to set vertical layout", e);
+        }
 
         this._arrowLbl    = new St.Label({ style: "font-size: 72px; text-align: center;", x_align: Clutter.ActorAlign.CENTER });
         this._phaseLbl    = new St.Label({ style: "font-size: 50px; font-weight: bold; text-align: center;", x_align: Clutter.ActorAlign.CENTER });
@@ -427,24 +437,80 @@ class BreathingSession extends St.Widget {
         this.add_child(content);
 
         // Cover full stage
-        Main.uiGroup.add_child(this);
-        this.set_position(0, 0);
-        this.set_size(global.screen_width, global.screen_height);
-        Main.uiGroup.set_child_above_sibling(this, null);
+        try {
+            Main.uiGroup.add_child(this);
+        } catch (e) {
+            console.error("BreathingReminder: failed to add session to uiGroup", e);
+        }
+        try {
+            let w = 0, h = 0;
+            try {
+                if (global.display && typeof global.display.get_size === 'function') {
+                    [w, h] = global.display.get_size();
+                } else if (typeof global.screen_width !== 'undefined') {
+                    w = global.screen_width; h = global.screen_height;
+                }
+            } catch (_) {}
+            const monitor = Main.layoutManager.primaryMonitor || (Main.layoutManager.monitors && Main.layoutManager.monitors[0]);
+            if (monitor) {
+                this.set_position(monitor.x, monitor.y);
+                this.set_size(monitor.width, monitor.height);
+            } else if (w && h) {
+                this.set_position(0, 0);
+                this.set_size(w, h);
+            } else {
+                this.set_position(0, 0);
+                this.set_size(1920, 1080);
+            }
+        } catch (e) {
+            try {
+                this.set_position(0, 0);
+                this.set_size(1920, 1080);
+            } catch (_) {}
+        }
+        try {
+            Main.uiGroup.set_child_above_sibling(this, null);
+        } catch (_) {}
 
         if (!this._unredirectDisabled) {
-            global.compositor.disable_unredirect();
-            this._unredirectDisabled = true;
+            try {
+                if (global.compositor && typeof global.compositor.disable_unredirect === 'function') {
+                    global.compositor.disable_unredirect();
+                    this._unredirectDisabled = true;
+                }
+            } catch (e) {
+                // May not be available in newer GNOME Shell versions
+            }
         }
 
         // Fade in
         this.set_opacity(0);
         this.ease({ opacity: 255, duration: 400, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
 
-        this._grab  = global.stage.grab(this);
-        this.grab_key_focus();
-        this._keyId = this.connect("key-press-event", (_, ev) => {
-            if (ev.get_key_symbol() === Clutter.KEY_Escape) { this.end(); return Clutter.EVENT_STOP; }
+        try {
+            if (global.stage && typeof global.stage.grab === 'function') {
+                this._grab = global.stage.grab(this);
+            }
+        } catch (e) {
+            console.error("BreathingReminder: stage.grab failed", e);
+            this._grab = null;
+        }
+        try {
+            this.grab_key_focus();
+        } catch (e) {}
+        try {
+            if (global.stage && typeof global.stage.set_key_focus === 'function') {
+                global.stage.set_key_focus(this);
+            }
+        } catch (e) {}
+        this._keyId = this.connect("key-press-event", (actor, ev) => {
+            try {
+                const key = typeof ev.get_key_symbol === 'function' ? ev.get_key_symbol() : ev.keyval;
+                if (key === Clutter.KEY_Escape) {
+                    this.end();
+                    return Clutter.EVENT_STOP;
+                }
+            } catch (_) {}
             return Clutter.EVENT_PROPAGATE;
         });
 
@@ -509,14 +575,20 @@ class BreathingSession extends St.Widget {
             opacity: 0, duration: 300, mode: Clutter.AnimationMode.EASE_IN_QUAD,
             onComplete: () => {
                 if (this._keyId)  { this.disconnect(this._keyId); this._keyId = null; }
-                if (this._grab)   { this._grab.dismiss(); this._grab = null; }
+                if (this._grab)   { try { this._grab.dismiss(); } catch (_) {} this._grab = null; }
                 if (this._unredirectDisabled) {
-                    global.compositor.enable_unredirect();
+                    try {
+                        if (global.compositor && typeof global.compositor.enable_unredirect === 'function') {
+                            global.compositor.enable_unredirect();
+                        }
+                    } catch (_) {}
                     this._unredirectDisabled = false;
                 }
-                Main.uiGroup.remove_child(this);
-                this.destroy();
-                this._onEnd?.();
+                try {
+                    Main.uiGroup.remove_child(this);
+                } catch (_) {}
+                try { this.destroy(); } catch (_) {}
+                try { this._onEnd?.(); } catch (_) {}
             },
         });
     }
